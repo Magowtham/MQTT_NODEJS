@@ -66,6 +66,17 @@ mongoose.connection
             });
             return;
           }
+          if(data.st===3)
+          {
+            const [isUserExists]=await db.collection("users").find({rfid:data.rid},{projection:{_id:1,balance:1}});
+            if(!isUserExists)
+            {
+              aedes.publish({topic,payload:JSON.stringify({bal:-1})});
+              return;
+            }
+            aedes.publish({topic,payload:JSON.stringify({bal:isUserExists.balance})})
+            return;
+          }
           if(data.amt){
             const result=await rechargeUser(isUserExists._id.toString(),data.rid,data.amt,db,isUserExists.balance);
             if(typeof result==="object"){
